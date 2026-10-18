@@ -7,7 +7,7 @@ import enum
 from datetime import datetime, time
 from typing import TYPE_CHECKING, Optional
 
-from sqlalchemy import DateTime, Enum, Float, Integer, String, Time
+from sqlalchemy import DateTime, Double, Enum, Integer, String, Time
 from sqlalchemy.orm import Mapped, mapped_column, relationship
 
 from app.models.base import Base
@@ -47,14 +47,14 @@ class Weather(Base):
     location_name: Mapped[str] = mapped_column(String(255))                # текст
     last_updated: Mapped[datetime] = mapped_column(DateTime, index=True)   # дата
     wind_degree: Mapped[Optional[int]] = mapped_column(Integer)            # ціле
-    wind_kph: Mapped[Optional[float]] = mapped_column(Float)               # дробне
+    wind_kph: Mapped[Optional[float]] = mapped_column(Double)               # дробне
     wind_direction: Mapped[Optional[WindDirection]] = mapped_column(       # enum
         Enum(WindDirection, name="wind_direction_enum")
     )
     sunrise: Mapped[Optional[time]] = mapped_column(Time)                  # час
 
     # --- загальна інформація для виводу ---
-    temperature_celsius: Mapped[Optional[float]] = mapped_column(Float)
+    temperature_celsius: Mapped[Optional[float]] = mapped_column(Double)
     condition_text: Mapped[Optional[str]] = mapped_column(String(100))
 
     # --- зв'язок "один до одного" з таблицею осадів ---
