@@ -5,7 +5,7 @@
 """
 from typing import TYPE_CHECKING, Optional
 
-from sqlalchemy import Float, ForeignKey, Integer
+from sqlalchemy import Boolean, Float, ForeignKey, Integer
 from sqlalchemy.orm import Mapped, mapped_column, relationship
 
 from app.models.base import Base
@@ -26,6 +26,9 @@ class Precipitation(Base):
     precip_in: Mapped[Optional[float]] = mapped_column(Float)   # опади, дюйми
     humidity: Mapped[Optional[int]] = mapped_column(Integer)    # вологість, %
     cloud: Mapped[Optional[int]] = mapped_column(Integer)       # хмарність, %
+
+    # Етап 3: "Чи варто виходити на вулицю" (рахується в GoOutsideService)
+    should_go_outside: Mapped[bool] = mapped_column(Boolean, nullable=False)
 
     weather: Mapped["Weather"] = relationship(back_populates="precipitation")
 

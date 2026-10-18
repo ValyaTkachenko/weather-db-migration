@@ -11,6 +11,7 @@ from pathlib import Path
 
 from app.models import Precipitation, Weather
 from app.repositories.weather_repository import WeatherRepository
+from app.services.go_outside_service import should_go_outside
 from app.services.parsers import (
     parse_datetime,
     parse_float,
@@ -106,5 +107,9 @@ class CsvImportService:
         if not weather_data["country"] or weather_data["last_updated"] is None:
             raise ValueError("порожня країна або дата")
         weather = Weather(**weather_data)
-        weather.precipitation = Precipitation(**self._extract(raw, PRECIPITATION_COLUMNS))
+        precip_data = self._extract(raw, PRECIPITATION_COLUMNS)
+        precip_data["should_go_outside"] = should_go_outside(
+            precip_data["precip_mm"], precip_data["humidity"], precip_data["cloud"]
+        )
+        weather.precipitation = Precipitation(**precip_data)
         return weather
