@@ -1,16 +1,19 @@
-"""ORM-модель таблиці weather (етап 1: усі дані в одній таблиці).
+"""ORM-модель таблиці weather.
 
-З CSV, де ~40 колонок, в ORM описані тільки потрібні:
-обов'язкові за завданням + колонки категорії "осади" (варіант 19).
+Етап 2: колонки категорії "осади" винесено в окрему таблицю precipitation
+(див. app/models/precipitation.py). Тут залишилися загальні дані про погоду.
 """
 import enum
 from datetime import datetime, time
-from typing import Optional
+from typing import TYPE_CHECKING, Optional
 
 from sqlalchemy import DateTime, Enum, Float, Integer, String, Time
-from sqlalchemy.orm import Mapped, mapped_column
+from sqlalchemy.orm import Mapped, mapped_column, relationship
 
 from app.models.base import Base
+
+if TYPE_CHECKING:
+    from app.models.precipitation import Precipitation
 
 
 class WindDirection(str, enum.Enum):
@@ -54,11 +57,10 @@ class Weather(Base):
     temperature_celsius: Mapped[Optional[float]] = mapped_column(Float)
     condition_text: Mapped[Optional[str]] = mapped_column(String(100))
 
-    # --- категорія "осади" (варіант 19) ---
-    precip_mm: Mapped[Optional[float]] = mapped_column(Float)
-    precip_in: Mapped[Optional[float]] = mapped_column(Float)
-    humidity: Mapped[Optional[int]] = mapped_column(Integer)
-    cloud: Mapped[Optional[int]] = mapped_column(Integer)
+    # --- зв'язок "один до одного" з таблицею осадів ---
+    precipitation: Mapped[Optional["Precipitation"]] = relationship(
+        back_populates="weather", uselist=False, cascade="all, delete-orphan"
+    )
 
     def __repr__(self) -> str:
         return f"<Weather {self.country} {self.location_name} {self.last_updated}>"
